@@ -11,9 +11,11 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "vue": "^3.2.45"
+    "vue": "^3.2.45",
+    "vue-accessible-color-picker": "^4.1.2"
   },
   "devDependencies": {
+    "@iconify/vue": "^4.0.2",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/node": "^18.11.12",
     "@vitejs/plugin-vue": "^4.0.0",

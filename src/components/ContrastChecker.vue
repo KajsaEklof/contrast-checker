@@ -1,19 +1,41 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { onBeforeMount, reactive, ref, watch } from "vue";
+import { Icon } from "@iconify/vue";
+import ThemeColours from "./ThemeColours.vue";
+import { ColorPicker } from "vue-accessible-color-picker";
 
-const contrastData = ref({});
-const foregroundColour = ref("");
-const backgroundColour = ref("");
+const contrastData: { [key: string]: string } = reactive({});
+const ratio = ref("");
+const foregroundColour = ref("#000000");
+const backgroundColour = ref("#ffffff");
+const icons: { [key: string]: string } = {
+  pass: "material-symbols:check-small-rounded",
+  fail: "material-symbols:close-rounded",
+};
 
-watch(foregroundColour, (newValue, oldValue) => {
-  console.log(newValue, oldValue);
+watch([foregroundColour, backgroundColour], () => {
+  console.log(foregroundColour, backgroundColour);
   checkContrast();
 });
 
-watch(backgroundColour, (newValue, oldValue) => {
-  console.log(newValue, oldValue);
+onBeforeMount(() => {
   checkContrast();
 });
+
+function updateColor(
+  eventData: { [key: string]: { [key: string]: string } | string },
+  type: string
+): void {
+  console.log(eventData, type);
+  console.log("type", type);
+  switch (type) {
+    case "foreground":
+      foregroundColour.value = eventData.cssColor as string;
+      break;
+    case "background":
+      backgroundColour.value = eventData.cssColor as string;
+  }
+}
 
 function checkContrast() {
   const fColour = foregroundColour.value.replace("#", "");
@@ -24,33 +46,74 @@ function checkContrast() {
 
   fetch(url)
     .then((response) => response.json())
-    .then((data) => (contrastData.value = data))
+    .then((data) => {
+      console.log(data);
+      ratio.value = data.ratio;
+      contrastData.AA = data.AA;
+      contrastData.AALarge = data.AALarge;
+      contrastData.AAA = data.AAA;
+      contrastData.AAALarge = data.AAALarge;
+    })
     .catch((error) => {
-      console.log("error", error);
+      // console.log("error", error);
     });
 }
 </script>
 
 <template>
-  <div>
-    <h1>Contrast Checker</h1>
-    <div>
-      <label for="foreground">Foreground Colour</label>
-      <input
-        v-model="foregroundColour"
-        type="color"
-        name="foreground"
-        id="foreground"
-      />
-      <label for="background">Background Colour</label>
-      <input
-        v-model="backgroundColour"
-        type="color"
-        name="background"
-        id="background"
-      />
+  <div
+    :style="{ backgroundColor: backgroundColour, color: foregroundColour }"
+    class="contrast-checker"
+  >
+    <h1>Colour Contrast Checker</h1>
+    <div class="d-flex align-start justify-between">
+      <div class="d-flex column">
+        <div class="ratio-wrapper">
+          <span>Aa</span><span>Ratio: {{ ratio }}</span>
+        </div>
+        <div class="levels">
+          <div
+            v-for="(result, level) in contrastData"
+            :key="level"
+            class="level-wrapper justify-center"
+          >
+            <span
+              :class="[
+                'grade d-flex align-center',
+                { fail: result === 'fail', pass: result === 'pass' },
+              ]"
+            >
+              <Icon :icon="icons[result]" />
+              {{ result }}
+            </span>
+            <span class="level"> {{ level }} </span>
+          </div>
+        </div>
+      </div>
+      <div class="colour-pickers d-flex">
+        <div class="d-flex column">
+          <h4>Foreground</h4>
+          <ColorPicker
+            :color="foregroundColour"
+            :visible-formats="['hex']"
+            default-format="hex"
+            class="foreground"
+            @color-change="updateColor($event, 'foreground')"
+          />
+        </div>
+        <div class="d-flex column">
+          <h4>Background</h4>
+          <ColorPicker
+            :color="backgroundColour"
+            :visible-formats="['hex']"
+            default-format="hex"
+            class="background"
+            @color-change="updateColor($event, 'background')"
+          />
+        </div>
+      </div>
     </div>
-
-    <pre>{{ contrastData }}</pre>
+    <!-- <ThemeColours /> -->
+    <!-- <pre>{{ contrastData }}</pre> -->
   </div>
 </template>
