@@ -2,7 +2,6 @@
 import { onBeforeMount, reactive, ref, watch } from "vue";
 import { Icon } from "@iconify/vue";
 import ThemeColours from "./ThemeColours.vue";
-import { ColorPicker } from "vue-accessible-color-picker";
 
 const contrastData: { [key: string]: string } = reactive({});
 const ratio = ref("");
@@ -22,21 +21,6 @@ onBeforeMount(() => {
   checkContrast();
 });
 
-function updateColor(
-  eventData: { [key: string]: { [key: string]: string } | string },
-  type: string
-): void {
-  console.log(eventData, type);
-  console.log("type", type);
-  switch (type) {
-    case "foreground":
-      foregroundColour.value = eventData.cssColor as string;
-      break;
-    case "background":
-      backgroundColour.value = eventData.cssColor as string;
-  }
-}
-
 function checkContrast() {
   const fColour = foregroundColour.value.replace("#", "");
   const bColour = backgroundColour.value.replace("#", "");
@@ -47,7 +31,7 @@ function checkContrast() {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      console.log("data", data);
       ratio.value = data.ratio;
       contrastData.AA = data.AA;
       contrastData.AALarge = data.AALarge;
@@ -66,8 +50,8 @@ function checkContrast() {
     class="contrast-checker"
   >
     <h1>Colour Contrast Checker</h1>
-    <div class="d-flex align-start justify-between">
-      <div class="d-flex column">
+    <div class="d-flex align-center justify-between colour-checker">
+      <div class="d-flex column ratio-levels">
         <div class="ratio-wrapper">
           <span>Aa</span><span>Ratio: {{ ratio }}</span>
         </div>
@@ -83,37 +67,43 @@ function checkContrast() {
                 { fail: result === 'fail', pass: result === 'pass' },
               ]"
             >
-              <Icon :icon="icons[result]" />
               {{ result }}
+              <Icon :icon="icons[result]" />
             </span>
             <span class="level"> {{ level }} </span>
           </div>
         </div>
       </div>
       <div class="colour-pickers d-flex">
-        <div class="d-flex column">
-          <h4>Foreground</h4>
-          <ColorPicker
-            :color="foregroundColour"
-            :visible-formats="['hex']"
-            default-format="hex"
-            class="foreground"
-            @color-change="updateColor($event, 'foreground')"
-          />
-        </div>
-        <div class="d-flex column">
-          <h4>Background</h4>
-          <ColorPicker
-            :color="backgroundColour"
-            :visible-formats="['hex']"
-            default-format="hex"
-            class="background"
-            @color-change="updateColor($event, 'background')"
-          />
-        </div>
+        <fieldset>
+          <legend>Foreground</legend>
+          <div class="d-flex align-center">
+            <label hidden for="foreground-colour-input">Foreground</label>
+            <input
+              v-model="foregroundColour"
+              type="color"
+              id="foreground-colour-input"
+            />
+            <span>{{ foregroundColour }}</span>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Background</legend>
+          <div class="d-flex align-center">
+            <label hidden for="readonly-background"></label>
+            <input
+              v-model="backgroundColour"
+              type="color"
+              id="readonly-background"
+            />
+            <span>{{ backgroundColour }}</span>
+          </div>
+        </fieldset>
       </div>
     </div>
-    <!-- <ThemeColours /> -->
-    <!-- <pre>{{ contrastData }}</pre> -->
+    <ThemeColours
+      :background="backgroundColour"
+      :foreground="foregroundColour"
+    />
   </div>
 </template>
