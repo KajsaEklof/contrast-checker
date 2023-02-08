@@ -5,6 +5,14 @@
   padding: 3em;
 
   .colour-checker {
+    flex-direction: column;
+    align-items: flex-start;
+
+    // @include lg {
+    //   flex-direction: row;
+    //   align-items: center;
+    // }
+
     .ratio-levels {
       min-width: 50%;
     }
@@ -38,11 +46,18 @@
         font-weight: 500;
       }
 
-      input {
+      input:not(.colour-input) {
         border: none;
         background: transparent;
         padding: 0;
         height: 2.5em;
+      }
+
+      input {
+        &.colour-input {
+          margin-left: 1em;
+          font-size: 1em;
+        }
       }
 
       span {

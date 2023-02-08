@@ -13,7 +13,6 @@ const icons: { [key: string]: string } = {
 };
 
 watch([foregroundColour, backgroundColour], () => {
-  console.log(foregroundColour, backgroundColour);
   checkContrast();
 });
 
@@ -31,7 +30,6 @@ function checkContrast() {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      console.log("data", data);
       ratio.value = data.ratio;
       contrastData.AA = data.AA;
       contrastData.AALarge = data.AALarge;
@@ -50,7 +48,7 @@ function checkContrast() {
     class="contrast-checker"
   >
     <h1>Colour Contrast Checker</h1>
-    <div class="d-flex align-center justify-between colour-checker">
+    <div class="d-flex justify-between colour-checker">
       <div class="d-flex column ratio-levels">
         <div class="ratio-wrapper">
           <span>Aa</span><span>Ratio: {{ ratio }}</span>
@@ -84,7 +82,13 @@ function checkContrast() {
               type="color"
               id="foreground-colour-input"
             />
-            <span>{{ foregroundColour }}</span>
+            <label hidden for="foreground-text-input">Foreground</label>
+            <input
+              v-model="foregroundColour"
+              class="colour-input"
+              type="text"
+              id="foreground-text-input"
+            />
           </div>
         </fieldset>
         <fieldset>
@@ -96,7 +100,13 @@ function checkContrast() {
               type="color"
               id="readonly-background"
             />
-            <span>{{ backgroundColour }}</span>
+            <label hidden for="background-text-input">Background</label>
+            <input
+              v-model="backgroundColour"
+              class="colour-input"
+              type="text"
+              id="background-text-input"
+            />
           </div>
         </fieldset>
       </div>

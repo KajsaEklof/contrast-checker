@@ -94,13 +94,12 @@ async function checkContrast(
   await fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       response = data;
 
       return data;
     })
     .catch((error) => {
-      console.log("error", error);
+      // console.log("error", error);
     });
 
   return response;
